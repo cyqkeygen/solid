@@ -1,0 +1,141 @@
+## 依赖注入
+
+### 优点
+1. 解偶（便于扩展，只需要改动外部注入操作代码，不需要改动主逻辑代码, 便于单元测试)
+2. 减少代码量，且业务逻辑清晰
+3. 一切面向对象编程
+
+
+### 如何实现
+
+#### 1.声明接口interface
+````
+// file interfaces.ts
+
+export interface Warrior {
+    fight(): string;
+    sneak(): string;
+}
+
+export interface Weapon {
+    hit(): string;
+}
+
+export interface ThrowableWeapon {
+    throw(): string;
+}
+````
+
+#### 2.配置type（InversifyJS推荐）
+````
+// file types.ts
+
+const TYPES = {
+    Warrior: Symbol.for("Warrior"),
+    Weapon: Symbol.for("Weapon"),
+    ThrowableWeapon: Symbol.for("ThrowableWeapon")
+};
+
+export { TYPES };
+````
+
+#### 3.注入代码（使用@inject @injectable）
+````
+// file entities.ts
+
+// injectable injectable reflect-metadata 需要引入有点多余
+import { injectable, injectable } from "inversify";
+import "reflect-metadata";
+// 引入需要实现的接口
+import { Weapon, ThrowableWeapon, Warrior } from "./interfaces"
+import { TYPES } from "./types";
+
+@injectable()
+class Katana implements Weapon {
+    public hit() {
+        return "cut!";
+    }
+}
+
+@injectable()
+class Shuriken implements ThrowableWeapon {
+    public throw() {
+        return "hit!";
+    }
+}
+
+@injectable()
+class Ninja implements Warrior {
+
+    private _katana: Weapon;
+    private _shuriken: ThrowableWeapon;
+
+    public constructor(
+	    @inject(TYPES.Weapon) katana: Weapon,
+	    @inject(TYPES.ThrowableWeapon) shuriken: ThrowableWeapon
+    ) {
+        this._katana = katana;
+        this._shuriken = shuriken;
+    }
+
+    public fight() { return this._katana.hit(); }
+    public sneak() { return this._shuriken.throw(); }
+
+}
+
+export { Ninja, Katana, Shuriken };
+````
+
+如果不想通过构造函数去实现注入，可以使用属性注入，个人认为<font color=red>属性注入可读性好一些</font>
+````
+@injectable()
+class Ninja implements Warrior {
+    @inject(TYPES.Weapon) private _katana: Weapon;
+    @inject(TYPES.ThrowableWeapon) private _shuriken: ThrowableWeapon;
+    public fight() { return this._katana.hit(); }
+    public sneak() { return this._shuriken.throw(); }
+}
+````
+
+#### 4. 编写注入容器
+````
+// file inversify.config.ts
+
+import { Container } from "inversify";
+import { TYPES } from "./types";
+import { Warrior, Weapon, ThrowableWeapon } from "./interfaces";
+import { Ninja, Katana, Shuriken } from "./entities";
+
+const myContainer = new Container();
+myContainer.bind<Warrior>(TYPES.Warrior).to(Ninja);
+myContainer.bind<Weapon>(TYPES.Weapon).to(Katana);
+myContainer.bind<ThrowableWeapon>(TYPES.ThrowableWeapon).to(Shuriken);
+
+export { myContainer };
+````
+
+#### 5. 实例化
+使用步骤4创建的容器，创建一个实例
+````
+import { myContainer } from "./inversify.config";
+import { TYPES } from "./types";
+import { Warrior } from "./interfaces";
+
+// const shuriken = new Shuriken()
+// const katana = new Katana()
+// const ninja = new Ninja(shuriken, katana)
+// 相对于上面代码，少了手动实例化的操作
+const ninja = myContainer.get<Warrior>(TYPES.Warrior);
+
+expect(ninja.fight()).eql("cut!"); // true
+expect(ninja.sneak()).eql("hit!"); // true
+````
+
+### 缺点
+1. 需要配置依赖注入容器，即注入类如何实例化，相对繁琐
+2. 经过5个步骤才可以生成一个实例，使用了一些反射机制，给系统运行加入了一些额外的系统开销
+3. 还未找到一些质量较好的依赖注入工具包（测试覆盖率高，编写注入容器容易）
+
+#### 结论
+1. 简单项目可以不使用
+2. 在大型程序中，可使用性很高，有减少冗余的代码，提高代码可读性，解偶等好处。基于SOLID原则。产生的额外系统开销实际上可以忽略。

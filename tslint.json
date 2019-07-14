@@ -1,0 +1,16 @@
+{
+  "defaultSeverity": "error",
+  "extends": "tslint-config-klg",
+  "jsRules": {},
+  "rules": {
+    "no-unused-variable": true,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "never",
+        "singleline": "never"
+      }
+    ]
+  },
+  "rulesDirectory": []
+}
