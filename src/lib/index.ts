@@ -1,5 +1,5 @@
-import * as Decorator from './decorator'
+import * as Meta from './meta'
 
 export {
-  Decorator
+  Meta
 }

@@ -40,6 +40,9 @@ export { TYPES };
 ````
 
 #### 3.注入代码（使用@inject @injectable）
+1. 引入interface，而非直接引入依赖类，有利于解偶
+2. 需要的依赖类实例化交给步骤4的注入容器
+3. 最好使用接口分离原则
 ````
 // file entities.ts
 
