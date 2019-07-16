@@ -10,7 +10,12 @@
     "target": "es6",
     "sourceMap": true,
     "allowJs": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": [
+      "reflect-metadata",
+      "mocha"
+    ]
+    // "lib": ["es6"]
   },
   "include": [
     "src/**/*"
