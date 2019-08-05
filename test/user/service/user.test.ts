@@ -1,7 +1,7 @@
 import * as assert from 'power-assert'
-import {container} from '../../src/inversify.config'
-import {TYPTES} from '../../src/type'
-import {IUser} from '../../src/user/interface/IUser'
+import {container} from '../../../app/inversify.config'
+import {TYPTES} from '../../../app/type'
+import {IUser} from '../../../app/user/interface/IUser'
 
 describe('发送验证码', async () => { 
   it('发送成功', async () => {

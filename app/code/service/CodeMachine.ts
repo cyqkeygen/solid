@@ -1,11 +1,11 @@
 import { TYPTES } from '../../type'
 import {ICodeMachine, ICodeParam} from '../interface/ICode'
-import {ISmsSingle} from '../../sms/interface/ISms'
+import {ISmsSingleAbstract} from '../../sms/interface/sms.abstract'
 import {injectable, inject} from 'inversify' 
 
 @injectable()
 export default class CodeMachine implements ICodeMachine {
-  @inject(TYPTES.Sms) private sms: ISmsSingle
+  @inject(TYPTES.Sms) private sms: ISmsSingleAbstract
 
   async send (param: ICodeParam) {
     const {phone, code} = param

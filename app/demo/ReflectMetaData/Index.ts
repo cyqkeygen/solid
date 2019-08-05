@@ -1,20 +1,24 @@
 import * as http from 'http'
-// import * as Koa from 'koa'
-import * as bodyParser  from 'koa-bodyparser'
-import * as json  from 'koa-json'
-import Router from './router'
+import * as Koa from 'koa'
+import * as bodyparser from 'koa-bodyparser'
+import router from './Router'
 
-const Koa = require('koa')
+const beginTime = Date.now()
+
 const app = new Koa()
 
-// middlewares
-app.use(bodyParser())
-app.use(json())
-app.use(Router.routes(), Router.allowedMethods())
+app.use(bodyparser())
+app.use(router.routes())
+app.use(router.allowedMethods())
 
 const server = http.createServer(app.callback())
+const port = 8080
 
-server.listen(8080)
+if (!module.parent) {
+  server.listen(port)
+}
+
+console.log(`app start in ${process.env.NODE_ENV} env, ${(Date.now() - beginTime) / 1000} s, listen on port ${port}`)
 
 function graceful () {
   try {

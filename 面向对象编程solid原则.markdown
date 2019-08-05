@@ -8,12 +8,6 @@
 | D      | 依赖反转原则 |                                   认为一个方法应该遵从“依赖于抽象而不是一个实例” |
 
 
-### 优点
-1. 解偶
-2. 遵循开闭原则（即对扩展是开放的，对于修改是封闭的。便于扩展，只需要改动外部注入操作代码，不需要改动主逻辑代码, 便于单元测试)
-3. 减少代码量，且业务逻辑清晰
-4. 遵循单一职责原则，一切面向对象编程
-
 
 ### 如何实现
 
@@ -48,10 +42,11 @@ const TYPES = {
 export { TYPES };
 ````
 
-#### 3.注入代码（使用@inject @injectable）
+#### 3.业务代码编写（使用@inject @injectable）
 1. 引入interface，而非直接引入依赖类，有利于解偶
-2. 需要的依赖类实例化交给步骤4的注入容器
-3. 最好遵循接口分离原则
+2. 需要的依赖类实例化交给步骤4的IoC容器
+3. 最好遵循接口分离原则，减少因继承而必须在子类中写入空方法
+4. 最好遵循里氏替换法则，以便步骤4IoC容器可以随时更换注入依赖类实例化
 ````
 // file entities.ts
 
@@ -109,7 +104,7 @@ class Ninja implements Warrior {
 }
 ````
 
-#### 4. 编写注入容器
+#### 4. 编写IoC容器
 ````
 // file inversify.config.ts
 
@@ -127,7 +122,7 @@ export { myContainer };
 ````
 
 #### 5. 实例化
-使用步骤4创建的容器，创建一个实例
+使用步骤4创建的IoC容器，创建一个实例
 ````
 import { myContainer } from "./inversify.config";
 import { TYPES } from "./types";
@@ -143,10 +138,24 @@ expect(ninja.fight()).eql("cut!"); // true
 expect(ninja.sneak()).eql("hit!"); // true
 ````
 
+### 优点
+1. 解偶
+2. 遵循开闭原则（即对扩展是开放的，对于修改是封闭的。便于扩展，只需要改动外部注入操作代码，不需要改动主逻辑代码, 便于单元测试)
+3. 减少代码量，且业务逻辑清晰
+4. 遵循单一职责原则，一切面向对象编程
+
 ### 缺点
-1. 需要配置依赖注入容器，即注入类如何实例化，相对繁琐
+1. 需要配置IoC容器，即注入类如何实例化，相对繁琐，在容器注入依赖时，引用层级比较混淆，容易循环引用依赖。
 2. 经过5个步骤才可以生成一个实例，使用了一些反射机制，给系统运行加入了一些额外的系统开销
 3. 还未找到一些质量较好的依赖注入工具包（测试覆盖率高，编写注入容器容易）
+4. service类型IDE提示只能到interface,而不能直接到具体功能的实现
+
+### TODO
+1. 如何设计项目目录结构
+2. 如何对请求数据进行校验Joi
+3. 是否有必要有proxy这次第三方api请求代理
+4. 如何测试
+5. 对比圧测
 
 #### 结论
 1. 简单项目可以不使用
@@ -155,3 +164,5 @@ expect(ninja.sneak()).eql("hit!"); // true
 #### 参考
 [SOLID 原则 WIKI](https://zh.wikipedia.org/wiki/SOLID_(%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1))
 [InversifyJS](https://github.com/inversify/InversifyJS)
+[淘宝 TypeScript 多场景框架和方案实践（GMTC 2019 大会分享）](https://developer.aliyun.com/article/708018?spm=5176.8068049.0.0.7f0d6d19zeELgG)
+[为什么选择 Typescript | TypeScript体系调研报告](https://juejin.im/post/59c46bc86fb9a00a4636f939)

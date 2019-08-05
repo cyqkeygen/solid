@@ -8,10 +8,10 @@ export interface IMultiSmsParam {
   phones: Array<string>
 }
 
-export interface ISmsSingle {
+export interface ISmsSingleAbstract {
   send (param: ISingleSmsParam): void
 }
 
-export interface ISmsMultiple {
+export interface ISmsMultipleAbstract {
   multiSend (param: IMultiSmsParam): void
 }
