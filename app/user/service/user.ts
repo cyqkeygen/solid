@@ -15,7 +15,8 @@ const mockUser = {
 
 @injectable()
 export default class User implements IUser {
-  @inject(TYPTES.Code) private code: ICodeMachine
+  @inject(TYPTES.Code)
+  private code: ICodeMachine
 
   async show (param) {
     return mockUser
